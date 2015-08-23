@@ -2,7 +2,7 @@ name: Quests
 main: me.blackvein.quests.Quests
 version: ${project.version}${project.build.number}
 description: Player questing system
-dev-url: https://github.com/Blackvein/Quests/
+dev-url: https://github.com/dmulloy2/Quests/
 authors: [Blackvein, HappyPikachu, dmulloy2]
 softdepend: [Citizens, PhatLoots, Vault]
 permissions:
