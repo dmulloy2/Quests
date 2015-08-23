@@ -1525,11 +1525,8 @@ public class Quests extends JavaPlugin implements ConversationAbandonedListener,
     }
 
     private void adminPurge(final CommandSender cs, String[] args) {
-
         if (cs.hasPermission("quests.admin.*") || cs.hasPermission("quests.admin.purge")) {
-
             Quester quester = getQuester(args[1]);
-
             if (quester == null) {
                 cs.sendMessage(YELLOW + Lang.get("playerNotFound"));
                 return;
@@ -1542,7 +1539,7 @@ public class Quests extends JavaPlugin implements ConversationAbandonedListener,
                 final File dataFolder = new File(this.getDataFolder(), "data/");
                 final File found = new File(dataFolder, quester.id + ".yml");
                 found.delete();
-                addToBlacklist(quester.id);
+                //addToBlacklist(quester.id);
 
                 String msg = Lang.get("questPurged");
                 if (Bukkit.getOfflinePlayer(quester.id).getName() != null) {
@@ -1550,16 +1547,14 @@ public class Quests extends JavaPlugin implements ConversationAbandonedListener,
                 } else {
                     msg = msg.replaceAll("<player>", GREEN + args[1] + GOLD);
                 }
+
                 cs.sendMessage(GOLD + msg);
-                cs.sendMessage(PURPLE + " UUID: " + DARKAQUA + quester.id);
+                //cs.sendMessage(PURPLE + " UUID: " + DARKAQUA + quester.id);
             } catch (Exception e) {
                 getLogger().info("Data file does not exist for " + quester.id.toString());
             }
-
         } else {
-
             cs.sendMessage(RED + Lang.get("questCmdNoPerms"));
-
         }
     }
 
@@ -2417,39 +2412,31 @@ public class Quests extends JavaPlugin implements ConversationAbandonedListener,
     }
 
     private void showObjectives(final Player player) {
-
-        if (getQuester(player.getUniqueId()).currentQuests.isEmpty() == false) {
-
-            for (Quest q : getQuester(player.getUniqueId()).currentQuests.keySet()) {
-
-                try {
-
-                    if (getQuester(player.getUniqueId()).getQuestData(q).delayStartTime == 0) {
-
-                        String msg = Lang.get("questObjectivesTitle");
-                        msg = msg.replaceAll("<quest>", q.name);
-                        player.sendMessage(ChatColor.GOLD + msg);
-
-                        for (String s : getQuester(player.getUniqueId()).getObjectivesReal(q)) {
-
-                            player.sendMessage(s);
-
-                        }
-
-                    }
-
-                } catch (Exception e) {
-                    //TODO find source of NullPointerException from Github ticket #130
-                }
-
-            }
-
-        } else {
-
-            player.sendMessage(YELLOW + Lang.get("noActiveQuest"));
-
+        Quester quester = getQuester(player.getUniqueId());
+        if (quester == null) {
+            player.sendMessage(RED + "You have no Quests data.");
+            return;
         }
 
+        if (!quester.currentQuests.isEmpty()) {
+            for (Quest quest : quester.currentQuests.keySet()) {
+                QuestData data = quester.getQuestData(quest);
+                if (data.delayStartTime == 0) {
+                    String msg = Lang.get("questObjectivesTitle");
+                    msg = msg.replaceAll("<quest>", quest.name);
+                    player.sendMessage(ChatColor.GOLD + msg);
+
+                    List<String> objectives = quester.getObjectivesReal(quest);
+                    if (objectives != null) {
+                        for (String s : quester.getObjectivesReal(quest)) {
+                            player.sendMessage(s);
+                        }
+                    }
+                }
+            }
+        } else {
+            player.sendMessage(YELLOW + Lang.get("noActiveQuest"));
+        }
     }
 
     public void printAdminHelp(CommandSender cs) {
@@ -4880,21 +4867,28 @@ public class Quests extends JavaPlugin implements ConversationAbandonedListener,
         return false;
     }
 
+    // This always returned true if there was at least one element in the blacklist
+    // *Slow clap*
+
     public boolean checkQuester(UUID uuid) {
-
-        for (String s : questerBlacklist) {
-
-            try {
-                UUID.fromString(s);
-                return true;
-            } catch (IllegalArgumentException e) {
-                getLogger().warning(s + " in config.yml is not a valid UUID for quester-blacklist");
+        Iterator<String> iter = questerBlacklist.iterator();
+        while (iter.hasNext()) {
+            String blacklisted = iter.next();
+            if (blacklisted.equals("UUID")) {
+                iter.remove();
             }
 
+            try {
+                UUID check = UUID.fromString(blacklisted);
+                if (check.equals(uuid)) {
+                    return true;
+                }
+            } catch (Throwable ex) {
+                iter.remove();
+            }
         }
 
         return false;
-
     }
 
     public static boolean checkList(List<?> list, Class<?> c) {

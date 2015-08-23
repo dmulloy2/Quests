@@ -926,7 +926,8 @@ public class Lang {
         langMap.put("questForcedFinish", "<player> has forced you to finish your Quest <quest>.");
         langMap.put("questForceNextStage", "<player> has advanced to the next Stage in the Quest <quest>.");
         langMap.put("questForcedNextStage", "<player> has advanced you to the next Stage in your Quest <quest>.");
-        langMap.put("questPurged", "<player> has been purged and blacklisted.");
+        //langMap.put("questPurged", "<player> has been purged and blacklisted.");
+        langMap.put("questPurged", "<player> has been purged.");
         langMap.put("questRemoved", "Quest <quest> has been removed from player <player>'s completed Quests.");
         langMap.put("settingAllQuestPoints", "Setting all players' Quest Points...");
         langMap.put("allQuestPointsSet", "All players' Quest Points have been set to <number>!");
