@@ -104,7 +104,7 @@ public class Quests extends JavaPlugin implements ConversationAbandonedListener,
     public static int maxQuests = 0;
     public static String effect = "note";
     public final Map<UUID, Quester> questers = new HashMap<UUID, Quester>();
-    public final List<String> questerBlacklist = new LinkedList<String>();
+    public final List<String> questerBlacklist = new ArrayList<String>();
     public final List<CustomRequirement> customRequirements = new LinkedList<CustomRequirement>();
     public final List<CustomReward> customRewards = new LinkedList<CustomReward>();
     public final List<CustomObjective> customObjectives = new LinkedList<CustomObjective>();
@@ -552,11 +552,14 @@ public class Quests extends JavaPlugin implements ConversationAbandonedListener,
             config.set("max-quests", maxQuests);
         }
 
+        questerBlacklist.clear();
         for (String s : config.getStringList("quester-blacklist")) {
             if (!s.equals("UUID")) {
                 questerBlacklist.add(s);
             }
         }
+
+        config.set("quester-blacklist", questerBlacklist);
 
         try {
             config.save(new File(this.getDataFolder(), "config.yml"));
