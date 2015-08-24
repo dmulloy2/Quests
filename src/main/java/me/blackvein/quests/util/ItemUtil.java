@@ -13,9 +13,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class ItemUtil implements ColorUtil {
-	
-	static Quests plugin;
-	
+    static Quests plugin;
+
+    private ItemUtil() {
+    }
+
     /**
      * Will compare stacks by name, amount, data, display name/lore and enchantments
      *
@@ -91,17 +93,17 @@ public class ItemUtil implements ColorUtil {
         for (String arg : args) {
             arg = arg.replace("%COLON%", ":");
             if (arg.startsWith("name-")) {
-            	//Attempt to match item name. Returns null if invalid format
-            	try {
-            		stack = new ItemStack(Material.matchMaterial(arg.substring(5)));
-            	} catch (NullPointerException npe) {
-            	    Quests.getInstance().getLogger().info("[ItemParser] Invalid material: " + arg.substring(5));
-            		return null;
-            	}
+                // Attempt to match item name. Returns null if invalid format
+                try {
+                    stack = new ItemStack(Material.matchMaterial(arg.substring(5)));
+                } catch (NullPointerException npe) {
+                    Quests.getInstance().getLogger().info("[ItemParser] Invalid material: " + arg.substring(5));
+                    return null;
+                }
 
                 meta = stack.getItemMeta();
             } else if (arg.startsWith("amount-")) {
-            	stack.setAmount(Integer.parseInt(arg.substring(7)));
+                stack.setAmount(Integer.parseInt(arg.substring(7)));
             } else if (arg.startsWith("data-")) {
                 stack.setDurability(Short.parseShort(arg.substring(5)));
             } else if (arg.startsWith("enchantment-")) {
@@ -114,16 +116,15 @@ public class ItemUtil implements ColorUtil {
                 lore.add(arg.substring(5));
             } else {
                 Quests.getInstance().getLogger().info("[ItemParser] Invalid argument: " + arg);
-            	return null;
+                return null;
             }
         }
 
-        if (lore.isEmpty() == false) {
+        if (!lore.isEmpty()) {
             meta.setLore(lore);
         }
 
         stack.setItemMeta(meta);
-
         return stack;
 
     }
@@ -141,33 +142,32 @@ public class ItemUtil implements ColorUtil {
         if (is.getDurability() != 0) {
             serial += ":data-" + is.getDurability();
         }
+
         if (is.getEnchantments().isEmpty() == false) {
 
             for (Entry<Enchantment, Integer> e : is.getEnchantments().entrySet()) {
                 serial += ":enchantment-" + Quester.enchantmentString(e.getKey()) + " " + e.getValue();
             }
-
         }
+
         if (is.hasItemMeta()) {
 
             ItemMeta meta = is.getItemMeta();
             if (meta.hasDisplayName()) {
                 serial += ":displayname-" + meta.getDisplayName();
             }
+
             if (meta.hasLore()) {
                 for (String s : meta.getLore()) {
                     serial += ":lore-" + s;
                 }
             }
-
         }
 
         return serial;
-
     }
 
     public static String getDisplayString(ItemStack is) {
-
         String text;
 
         if (is.hasItemMeta() && is.getItemMeta().hasDisplayName()) {
@@ -187,11 +187,9 @@ public class ItemUtil implements ColorUtil {
         }
 
         return text;
-
     }
 
     public static String getString(ItemStack is) {
-
         String text;
 
         if (is.hasItemMeta() && is.getItemMeta().hasDisplayName()) {
@@ -207,11 +205,9 @@ public class ItemUtil implements ColorUtil {
         }
 
         return text;
-
     }
 
     public static String getName(ItemStack is) {
-
         String text;
 
         if (is.hasItemMeta() && is.getItemMeta().hasDisplayName()) {
@@ -221,34 +217,28 @@ public class ItemUtil implements ColorUtil {
         }
 
         return text;
-
     }
-    
+
     public static boolean isItem(ItemStack is) {
-        
-        if(is == null)
+        if (is == null)
             return false;
-        
-        if(is.getType().equals(Material.AIR))
+
+        if (is.getType().equals(Material.AIR))
             return false;
-        
+
         return true;
-        
-    }
-    
-    public static boolean isJournal(ItemStack is) {
-        
-        if(is == null)
-            return false;
-        
-        if(is.hasItemMeta() == false)
-            return false;
-        
-        if(is.getItemMeta().hasDisplayName() == false)
-            return false;
-        
-        return is.getItemMeta().getDisplayName().equals(PINK + Lang.get("journalTitle"));
-        
     }
 
+    public static boolean isJournal(ItemStack is) {
+        if (is == null)
+            return false;
+
+        if (is.hasItemMeta() == false)
+            return false;
+
+        if (is.getItemMeta().hasDisplayName() == false)
+            return false;
+
+        return is.getItemMeta().getDisplayName().equals(PINK + Lang.get("journalTitle"));
+    }
 }
