@@ -2,8 +2,10 @@ package me.blackvein.quests.util;
 
 import java.util.LinkedList;
 import java.util.Map.Entry;
+
 import me.blackvein.quests.Quester;
 import me.blackvein.quests.Quests;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -75,25 +77,28 @@ public class ItemUtil implements ColorUtil {
         }
     }
 
-    //Formats ->  name-name:amount-amount:data-data:enchantment-enchantment level:displayname-displayname:lore-lore:
-    //Returns null if invalid format
+    // Format ->  name-name:amount-amount:data-data:enchantment-enchantment level:displayname-displayname:lore-lore:
+    // Returns null if invalid format
     public static ItemStack readItemStack(String data) {
         if (data == null) {
             return null;
         }
-        
+
         ItemStack stack = null;
         String[] args = data.split(":");
         ItemMeta meta = null;
         LinkedList<String> lore = new LinkedList<String>();
         for (String arg : args) {
+            arg = arg.replace("%COLON%", ":");
             if (arg.startsWith("name-")) {
             	//Attempt to match item name. Returns null if invalid format
             	try {
             		stack = new ItemStack(Material.matchMaterial(arg.substring(5)));
             	} catch (NullPointerException npe) {
+            	    Quests.getInstance().getLogger().info("[ItemParser] Invalid material: " + arg.substring(5));
             		return null;
             	}
+
                 meta = stack.getItemMeta();
             } else if (arg.startsWith("amount-")) {
             	stack.setAmount(Integer.parseInt(arg.substring(7)));
@@ -108,9 +113,9 @@ public class ItemUtil implements ColorUtil {
             } else if (arg.startsWith("lore-")) {
                 lore.add(arg.substring(5));
             } else {
+                Quests.getInstance().getLogger().info("[ItemParser] Invalid argument: " + arg);
             	return null;
             }
-
         }
 
         if (lore.isEmpty() == false) {
